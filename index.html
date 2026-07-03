@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>建设工程费用分包一览表</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+            background: #e9edf2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+        .container {
+            max-width: 1150px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(26, 58, 92, 0.15);
+            padding: 28px 30px 36px;
+            border-top: 6px solid #c9a84c;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 22px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid #e8d5a3;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .header-icon {
+            font-size: 32px;
+            color: #c9a84c;
+        }
+        .header-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1a3a5c;
+            letter-spacing: 1.5px;
+        }
+        .header-title small {
+            font-size: 15px;
+            font-weight: 400;
+            color: #4a5a6a;
+            letter-spacing: 0;
+            margin-left: 8px;
+        }
+        .header-badge {
+            background: #1a3a5c;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 4px 18px;
+            border-radius: 30px;
+            white-space: nowrap;
+        }
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #d0d7de;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            min-width: 760px;
+        }
+        thead {
+            background: #1a3a5c;
+            color: #fff;
+        }
+        thead th {
+            padding: 11px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.4px;
+            white-space: nowrap;
+        }
+        thead th:first-child { padding-left: 18px; width: 55px; }
+        thead th:nth-child(2) { min-width: 110px; }
+        thead th:nth-child(3) { min-width: 120px; }
+        thead th:nth-child(4) { min-width: 80px; }
+        thead th:nth-child(5) { min-width: 110px; }
+        thead th:last-child { padding-right: 18px; min-width: 100px; }
+
+        tbody tr {
+            border-bottom: 1px solid #e2e6ec;
+            transition: background 0.15s;
+        }
+        tbody tr:hover {
+            background: #f5f8fc;
+        }
+        tbody tr:nth-child(even) {
+            background: #fafbfd;
+        }
+        tbody tr:nth-child(even):hover {
+            background: #f0f4f9;
+        }
+        tbody tr.row-check {
+            background: #f4f8f0 !important;
+            border-top: 2px solid #c9a84c;
+            font-weight: 600;
+        }
+        tbody tr.row-check:hover {
+            background: #ecf4e5 !important;
+        }
+        tbody td {
+            padding: 7px 12px;
+            vertical-align: middle;
+            line-height: 1.4;
+        }
+        tbody td:first-child {
+            padding-left: 18px;
+            font-weight: 500;
+            color: #1a3a5c;
+        }
+        tbody td:last-child {
+            padding-right: 18px;
+        }
+
+        input[type="number"],
+        input[type="text"] {
+            font-family: inherit;
+            font-size: 14px;
+            padding: 4px 8px;
+            border: 1.5px solid #d0d7de;
+            border-radius: 6px;
+            background: #fff;
+            color: #1e2a3a;
+            transition: border 0.2s, box-shadow 0.2s;
+            outline: none;
+            width: 100%;
+            height: 32px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
+        }
+        input[type="number"]:focus,
+        input[type="text"]:focus {
+            border-color: #c9a84c;
+            box-shadow: 0 0 0 3px rgba(201,168,76,0.2);
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+        .input-price {
+            min-width: 80px;
+            font-weight: 500;
+        }
+        .input-rate {
+            min-width: 60px;
+            text-align: right;
+            padding-right: 4px;
+        }
+        .rate-wrap {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .rate-wrap .percent-sign {
+            font-weight: 500;
+            color: #4a5a6a;
+            font-size: 14px;
+        }
+        .tax-display {
+            font-weight: 600;
+            color: #1a3a5c;
+            font-variant-numeric: tabular-nums;
+            display: inline-block;
+            min-width: 70px;
+            text-align: right;
+        }
+        .check-amount {
+            font-weight: 700;
+            font-size: 15px;
+        }
+        .check-amount.balanced {
+            color: #27ae60;
+        }
+        .check-amount.unbalanced {
+            color: #c0392b;
+        }
+        .note-input {
+            font-size: 13px;
+            color: #4a5a6a;
+            border: 1px solid transparent;
+            background: transparent;
+            padding: 2px 4px;
+            width: 100%;
+            min-width: 60px;
+            transition: border 0.2s;
+        }
+        .note-input:hover {
+            border-color: #d0d7de;
+            background: #fff;
+        }
+        .note-input:focus {
+            border-color: #c9a84c;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
+        }
+        .subname-input {
+            font-weight: 500;
+            color: #1a3a5c;
+            border: 1px solid transparent;
+            background: transparent;
+            padding: 2px 4px;
+            width: 100%;
+            min-width: 70px;
+            transition: border 0.2s, background 0.2s;
+        }
+        .subname-input:hover {
+            border-color: #d0d7de;
+            background: #fff;
+        }
+        .subname-input:focus {
+            border-color: #c9a84c;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
+        }
+
+        .footer-note {
+            margin-top: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 13px;
+            color: #4a5a6a;
+            padding-top: 14px;
+            border-top: 1px solid #e2e6ec;
+        }
+        .footer-note .formula {
+            background: #f0f2f5;
+            padding: 3px 16px;
+            border-radius: 30px;
+            font-size: 12px;
+            color: #1a3a5c;
+        }
+        .footer-note .formula strong {
+            color: #c0392b;
+        }
+        .author-line {
+            margin-top: 12px;
+            text-align: right;
+            font-size: 13px;
+            color: #7f8c8d;
+            border-top: 1px solid #e2e6ec;
+            padding-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 16px 10px 20px; }
+            .header-title { font-size: 20px; }
+            .header-title small { font-size: 13px; display: block; margin-left: 0; }
+            .header-badge { font-size: 11px; padding: 3px 12px; }
+            table { font-size: 13px; min-width: 600px; }
+            thead th, tbody td { padding: 5px 8px; }
+            thead th:first-child, tbody td:first-child { padding-left: 10px; }
+            thead th:last-child, tbody td:last-child { padding-right: 10px; }
+            .input-price { min-width: 60px; }
+            .input-rate { min-width: 50px; }
+            .subname-input { min-width: 50px; }
+        }
+        @media (max-width: 480px) {
+            table { font-size: 12px; min-width: 480px; }
+            .input-price { min-width: 50px; font-size: 12px; height: 28px; }
+            .input-rate { min-width: 40px; font-size: 12px; height: 28px; }
+            .tax-display { min-width: 50px; font-size: 12px; }
+            .subname-input { font-size: 12px; height: 28px; }
+        }
+        @media print {
+            body { background: #fff; padding: 10px; }
+            .container { box-shadow: none; border-top: 3px solid #333; }
+            input { border: 1px solid #aaa !important; background: #fff !important; }
+            .header-badge { background: #333; }
+            tbody tr:hover { background: inherit; }
+            tbody tr:nth-child(even) { background: #f9f9f9; }
+            .note-input { border: 1px solid #ccc !important; background: #fff !important; }
+            .subname-input { border: 1px solid #ccc !important; background: #fff !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-left">
+            <span class="header-icon">🏗️</span>
+            <div class="header-title">
+                建设工程费用分包一览表
+                <small>价款 &amp; 税款明细</small>
+            </div>
+        </div>
+        <span class="header-badge">📋 实时计算</span>
+    </div>
+
+    <div class="table-wrap">
+        <table id="feeTable">
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>费用明细</th>
+                    <th>最终结算价款</th>
+                    <th>税率</th>
+                    <th>税款</th>
+                    <th>备注</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 行1：对上合同总价 -->
+                <tr id="row1">
+                    <td>1</td>
+                    <td><strong>对上合同总价</strong></td>
+                    <td><input type="number" id="price1" class="input-price" value="2060000" step="1" min="0"></td>
+                    <td>
+                        <div class="rate-wrap">
+                            <input type="number" id="rate1" class="input-rate" value="9" step="0.01" min="0" max="100">
+                            <span class="percent-sign">%</span>
+                        </div>
+                    </td>
+                    <td><span class="tax-display" id="tax1">0.00</span></td>
+                    <td><input type="text" id="note1" class="note-input" value="含税，已扣减11.5%税金 本行9%不要调整"></td>
+                </tr>
+                <!-- 行2：管理费 -->
+                <tr id="row2">
+                    <td>2</td>
+                    <td>管理费</td>
+                    <td><input type="number" id="price2" class="input-price" value="113300" step="1" min="0"></td>
+                    <td>
+                        <div class="rate-wrap">
+                            <input type="number" id="rate2" class="input-rate" value="0" step="0.01" min="0" max="100">
+                            <span class="percent-sign">%</span>
+                        </div>
+                    </td>
+                    <td><span class="tax-display" id="tax2">0.00</span></td>
+                    <td><input type="text" id="note2" class="note-input" value="本行税率填0"></td>
+                </tr>
+                <!-- 行3：招标代理费 -->
+                <tr id="row3">
+                    <td>3</td>
+                    <td>招标代理费</td>
+                    <td><input type="number" id="price3" class="input-price" value="14229" step="1" min="0"></td>
+                    <td>
+                        <div class="rate-wrap">
+                            <input type="number" id="rate3" class="input-rate" value="0" step="0.01" min="0" max="100">
+                            <span class="percent-sign">%</span>
+                        </div>
+                    </td>
+                    <td><span class="tax-display" id="tax3">0.00</span></td>
+                    <td><input type="text" id="note3" class="note-input" value="本行税率填0"></td>
+                </tr>
+                <!-- 行4：其他费用 -->
+                <tr id="row4">
+                    <td>4</td>
+                    <td>其他费用</td>
+                    <td><input type="number" id="price4" class="input-price" value="217339" step="1" min="0"></td>
+                    <td>
+                        <div class="rate-wrap">
+                            <input type="number" id="rate4" class="input-rate" value="0" step="0.01" min="0" max="100">
+                            <span class="percent-sign">%</span>
+                        </div>
+                    </td>
+                    <td><span class="tax-display" id="tax4">0.00</span></td>
+                    <td><input type="text" id="note4" class="note-input" value="本行税率填0"></td>
+                </tr>
+                <!-- 行5：分包1 - 分包1 -->
+                <tr id="row5">
+                    <td>5</td>
+                    <td><input type="text" id="subname5" class="subname-input" value="分包1"></td>
+                    <td><input type="number" id="price5" class="input-price" value="290000" step="1" min="0"></td>
+                    <td>
+                        <div class="rate-wrap">
+                            <input type="number" id="rate5" class="input-rate" value="13" step="0.01" min="0" max="100">
+                            <span class="percent-sign">%</span>
+                        </div>
+                    </td>
+                    <td><span class="tax-display" id="tax5">0.00</span></td>
+                    <td><input type="text" id="note5" class="note-input" value="含税价款，价税分离"></td>
+                </tr>
+                <!-- 行6：分包2 - 分包2 -->
+                <tr id="row6">
+                    <td>6</td>
+                    <td><input type="text" id="subname6" class="subname-input" value="分包2"></td>
+                    <td><input type="number" id="price6" class="input-price" value="289295" step="1" min="0"></td>
+                    <td>
+                        <div class="rate-wrap">
+                            <input type="number" id="rate6" class="input-rate" value="9" step="0.01" min="0" max="100">
+                            <span class="percent-sign">%</span>
+                        </div>
+                    </td>
+                    <td><span class="tax-display" id="tax6">0.00</span></td>
+                    <td><input type="text" id="note6" class="note-input" value="含税价款，价税分离"></td>
+                </tr>
+                <!-- 行7：分包3 - 分包3 -->
+                <tr id="row7">
+                    <td>7</td>
+                    <td><input type="text" id="subname7" class="subname-input" value="分包3"></td>
+                    <td><input type="number" id="price7" class="input-price" value="1193891.54" step="0.01" min="0"></td>
+                    <td>
+                        <div class="rate-wrap">
+                            <input type="number" id="rate7" class="input-rate" value="0" step="0.01" min="0" max="100">
+                            <span class="percent-sign">%</span>
+                        </div>
+                    </td>
+                    <td><span class="tax-display" id="tax7">0.00</span></td>
+                    <td><input type="text" id="note7" class="note-input" value="含税价款，价税分离"></td>
+                </tr>
+                <!-- 行8：分包4 -->
+                <tr id="row8">
+                    <td>8</td>
+                    <td><input type="text" id="subname8" class="subname-input" value="分包4"></td>
+                    <td><input type="number" id="price8" class="input-price" value="0" step="1" min="0"></td>
+                    <td>
+                        <div class="rate-wrap">
+                            <input type="number" id="rate8" class="input-rate" value="9" step="0.01" min="0" max="100">
+                            <span class="percent-sign">%</span>
+                        </div>
+                    </td>
+                    <td><span class="tax-display" id="tax8">0.00</span></td>
+                    <td><input type="text" id="note8" class="note-input" value="含税价款，价税分离"></td>
+                </tr>
+                <!-- 行9：分包5 -->
+                <tr id="row9">
+                    <td>9</td>
+                    <td><input type="text" id="subname9" class="subname-input" value="分包5"></td>
+                    <td><input type="number" id="price9" class="input-price" value="0" step="1" min="0"></td>
+                    <td>
+                        <div class="rate-wrap">
+                            <input type="number" id="rate9" class="input-rate" value="9" step="0.01" min="0" max="100">
+                            <span class="percent-sign">%</span>
+                        </div>
+                    </td>
+                    <td><span class="tax-display" id="tax9">0.00</span></td>
+                    <td><input type="text" id="note9" class="note-input" value="含税价款，价税分离"></td>
+                </tr>
+                <!-- 行10：分包6 -->
+                <tr id="row10">
+                    <td>10</td>
+                    <td><input type="text" id="subname10" class="subname-input" value="分包6"></td>
+                    <td><input type="number" id="price10" class="input-price" value="0" step="1" min="0"></td>
+                    <td>
+                        <div class="rate-wrap">
+                            <input type="number" id="rate10" class="input-rate" value="9" step="0.01" min="0" max="100">
+                            <span class="percent-sign">%</span>
+                        </div>
+                    </td>
+                    <td><span class="tax-display" id="tax10">0.00</span></td>
+                    <td><input type="text" id="note10" class="note-input" value="含税价款，价税分离"></td>
+                </tr>
+                <!-- 行11：分包7 -->
+                <tr id="row11">
+                    <td>11</td>
+                    <td><input type="text" id="subname11" class="subname-input" value="分包7"></td>
+                    <td><input type="number" id="price11" class="input-price" value="0" step="1" min="0"></td>
+                    <td>
+                        <div class="rate-wrap">
+                            <input type="number" id="rate11" class="input-rate" value="9" step="0.01" min="0" max="100">
+                            <span class="percent-sign">%</span>
+                        </div>
+                    </td>
+                    <td><span class="tax-display" id="tax11">0.00</span></td>
+                    <td><input type="text" id="note11" class="note-input" value="含税价款，价税分离"></td>
+                </tr>
+                <!-- 行12：分包8 -->
+                <tr id="row12">
+                    <td>12</td>
+                    <td><input type="text" id="subname12" class="subname-input" value="分包8"></td>
+                    <td><input type="number" id="price12" class="input-price" value="0" step="1" min="0"></td>
+                    <td>
+                        <div class="rate-wrap">
+                            <input type="number" id="rate12" class="input-rate" value="9" step="0.01" min="0" max="100">
+                            <span class="percent-sign">%</span>
+                        </div>
+                    </td>
+                    <td><span class="tax-display" id="tax12">0.00</span></td>
+                    <td><input type="text" id="note12" class="note-input" value="含税价款，价税分离"></td>
+                </tr>
+                <!-- 行13：验算 -->
+                <tr class="row-check" id="row13">
+                    <td>13</td>
+                    <td><strong>验算</strong></td>
+                    <td><span style="color:#7f8c8d;">—</span></td>
+                    <td><span style="color:#7f8c8d;">—</span></td>
+                    <td><span class="tax-display check-amount" id="tax13">0.00</span></td>
+                    <td><span id="checkStatus" style="font-weight:400; font-size:13px;"></span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer-note">
+        <span>
+            <strong>📌 计算规则：</strong>
+            行1税款 = 价款 ÷ 1.09 × 0.115；行2~4税款 = 价款 × 税率%；行5~12税款 = 价款 ÷ (1+税率%) × 税率%
+        </span>
+        <span class="formula">
+            <strong>验算公式：</strong>
+            行1价款 − 行1税款 − (行2+行3+行4+行5+行6+行7+行8+行9+行10+行11+行12)价款 + (行5+行6+行7+行8+行9+行10+行11+行12)税款
+        </span>
+    </div>
+
+    <div class="author-line">
+        作者：李冠-中核国投
+    </div>
+</div>
+
+<script>
+    (function() {
+        "use strict";
+
+        // 共12行数据（行1~12），索引0~11
+        const priceInputs = [
+            document.getElementById('price1'),
+            document.getElementById('price2'),
+            document.getElementById('price3'),
+            document.getElementById('price4'),
+            document.getElementById('price5'),
+            document.getElementById('price6'),
+            document.getElementById('price7'),
+            document.getElementById('price8'),
+            document.getElementById('price9'),
+            document.getElementById('price10'),
+            document.getElementById('price11'),
+            document.getElementById('price12')
+        ];
+        const rateInputs = [
+            document.getElementById('rate1'),
+            document.getElementById('rate2'),
+            document.getElementById('rate3'),
+            document.getElementById('rate4'),
+            document.getElementById('rate5'),
+            document.getElementById('rate6'),
+            document.getElementById('rate7'),
+            document.getElementById('rate8'),
+            document.getElementById('rate9'),
+            document.getElementById('rate10'),
+            document.getElementById('rate11'),
+            document.getElementById('rate12')
+        ];
+        const taxSpans = [
+            document.getElementById('tax1'),
+            document.getElementById('tax2'),
+            document.getElementById('tax3'),
+            document.getElementById('tax4'),
+            document.getElementById('tax5'),
+            document.getElementById('tax6'),
+            document.getElementById('tax7'),
+            document.getElementById('tax8'),
+            document.getElementById('tax9'),
+            document.getElementById('tax10'),
+            document.getElementById('tax11'),
+            document.getElementById('tax12')
+        ];
+        const tax13 = document.getElementById('tax13');
+        const checkStatus = document.getElementById('checkStatus');
+
+        function fmt(v) {
+            if (!isFinite(v)) return '0.00';
+            return v.toFixed(2);
+        }
+
+        function recalc() {
+            const prices = priceInputs.map(inp => {
+                let v = parseFloat(inp.value);
+                return isNaN(v) || v < 0 ? 0 : v;
+            });
+            const rates = rateInputs.map(inp => {
+                let v = parseFloat(inp.value);
+                return isNaN(v) || v < 0 ? 0 : v;
+            });
+
+            // 计算税款
+            // 行1 (索引0): 价款 / 1.09 * 0.115
+            const taxes = [];
+            taxes.push(prices[0] / 1.09 * 0.115);
+
+            // 行2~4 (索引1~3): 价款 * 税率%
+            for (let i = 1; i < 4; i++) {
+                taxes.push(prices[i] * (rates[i] / 100));
+            }
+
+            // 行5~12 (索引4~11): 价款 / (1 + 税率%) * 税率%  (价税分离)
+            for (let i = 4; i < 12; i++) {
+                const r = rates[i] / 100;
+                if (prices[i] === 0 || r === 0) {
+                    taxes.push(0);
+                } else {
+                    taxes.push(prices[i] / (1 + r) * r);
+                }
+            }
+
+            // 更新税款显示 (行1~12)
+            for (let i = 0; i < 12; i++) {
+                taxSpans[i].textContent = fmt(taxes[i]);
+            }
+
+            // ---- 验算 (行13) ----
+            // 验算 = 行1价款 - 行1税款 - (行2+行3+行4+行5+行6+行7+行8+行9+行10+行11+行12)价款
+            //        + (行5+行6+行7+行8+行9+行10+行11+行12)税款
+            let sumPrices2to12 = 0;
+            for (let i = 1; i < 12; i++) {
+                sumPrices2to12 += prices[i];
+            }
+            // 分包税款索引4~11 (行5~12)
+            let subTaxSum = 0;
+            for (let i = 4; i < 12; i++) {
+                subTaxSum += taxes[i];
+            }
+            // 增加扣减行1税款
+            let checkResult = prices[0] - taxes[0] - sumPrices2to12 + subTaxSum;
+
+            tax13.textContent = fmt(checkResult);
+
+            const eps = 0.01;
+            if (Math.abs(checkResult) < eps) {
+                checkStatus.innerHTML = '✅ 平衡';
+                checkStatus.style.color = '#27ae60';
+                tax13.className = 'tax-display check-amount balanced';
+            } else {
+                checkStatus.innerHTML = '⚠️ 不平衡 (差额: ' + fmt(checkResult) + ')';
+                checkStatus.style.color = '#c0392b';
+                tax13.className = 'tax-display check-amount unbalanced';
+            }
+
+            if (prices.every(p => p === 0)) {
+                checkStatus.innerHTML = '⏳ 请输入价款';
+                checkStatus.style.color = '#7f8c8d';
+                tax13.className = 'tax-display check-amount';
+            }
+        }
+
+        // 绑定事件
+        const allInputs = [...priceInputs, ...rateInputs];
+        allInputs.forEach(inp => {
+            inp.addEventListener('input', recalc);
+            inp.addEventListener('blur', function() {
+                if (this.value.trim() === '' || isNaN(parseFloat(this.value))) {
+                    this.value = '0';
+                    recalc();
+                }
+                let v = parseFloat(this.value);
+                if (!isNaN(v) && v < 0) {
+                    this.value = '0';
+                    recalc();
+                }
+            });
+        });
+
+        // Enter跳转（仅对价款和税率输入框）
+        const allNumberInputs = document.querySelectorAll('input[type="number"]');
+        allNumberInputs.forEach((inp, idx) => {
+            inp.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const next = allNumberInputs[idx + 1];
+                    if (next) {
+                        next.focus();
+                        next.select();
+                    }
+                }
+            });
+        });
+
+        recalc();
+    })();
+</script>
+
+</body>
+</html>
